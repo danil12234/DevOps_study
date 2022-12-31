@@ -1,0 +1,119 @@
+Перед выполнением заданий важно самостоятельно повторить шаги, выполняемые на уроке.
+
+1) Подключить пустой диск и создать на нем два основных и два логических раздела.
+fdisk /dev/sdb // переходим в новый диск
+n //создать раздел
+p // тип раздела primary
+1 // номер раздела
+2048 // начало раздела
++nGB // конец раздела
+повторяем тоже самое со вторым разделом
+n //создать раздел
+e // тип раздела extended
+3 // номер раздела
+n // начало раздела
++nGB // конец раздела
+n //создать раздел
+l // тип раздела logical
+5 // номер раздела
+n // начало раздела
++nGB // конец раздела
+повторяем тоже самое со вторым разделом
+Получаем:
+Disk /dev/sdb: 21.5 GB, 21474836480 bytes, 41943040 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0xfcc82075
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1            2048     5861375     2929664   83  Linux
+/dev/sdb2         5861376    11720703     2929664   83  Linux
+/dev/sdb3        11720704    33204223    10741760    5  Extended
+/dev/sdb5        11722752    19535871     3906560   83  Linux
+/dev/sdb6        19537920    27351039     3906560   83  Linux
+2) Смонтировать в них несколько пустоых корневых каталогов.
+mkfs.ext2 /dev/sdbN //форматируем раделы в ext2
+mkdir /mnt/test1 /mnt/test2 //создаем 2 папки
+mount /dev/sdb1 /mnt/test1 //монтируем 1 раздел в 1 папку
+mount /dev/sdb2 /mnt/test2 //монтируем 2 раздел в 2 папку
+3) Перенести каталог /home на отдельный раздел.
+mount /dev/sdb5 /home // монитруем папку на новый раздел
+vi etc/fstab // в данном файлике прписываем куда мониторвать папку 
+выглядит примерно так:
+#
+# /etc/fstab
+# Created by anaconda on Sat Dec 31 19:44:00 2022
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+/dev/mapper/centos-root /                       xfs     defaults        0 0
+UUID=17536ff9-2ef7-4b88-9166-89cd17a20d18 /boot                   xfs     defaults        0 0
+/dev/mapper/centos-swap swap                    swap    defaults        0 0
+/dev/sdb5               /home                   ext4    defaults        0 0
+4) Создать еще один раздел подкачки.
+fdisk /dev/sdb //заходим в диск
+n //создать раздел
+p // тип раздела primary
+4 // номер раздела
+n // начало раздела
++nGB // конец раздела
+t //меняем id раздела 
+4 // раздела для своп
+82 // id своп
+Получаем:
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1            2048     5861375     2929664   83  Linux
+/dev/sdb2         5861376    11720703     2929664   83  Linux
+/dev/sdb3        11720704    33204223    10741760    5  Extended
+/dev/sdb4        33204224    39063551     2929664   82  Linux swap / Solaris
+/dev/sdb5        11722752    19535871     3906560   83  Linux
+/dev/sdb6        19537920    27351039     3906560   83  Linux
+теперm идем в /etc/fstab/ и добавляем новый своп раздел
+#
+# /etc/fstab
+# Created by anaconda on Sat Dec 31 19:44:00 2022
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+/dev/mapper/centos-root /                       xfs     defaults        0 0
+UUID=17536ff9-2ef7-4b88-9166-89cd17a20d18 /boot                   xfs     defaults        0 0
+/dev/mapper/centos-swap swap                    swap    defaults        0 0
+/dev/sdb5               /home                   ext4    defaults        0 0
+/dev/sdb4               swap                    swap    defaults        0 0
+5) Добавить еще два диска и создать на нем несколько логических томов (LVM).
+fdisk /dev/sdb //заходим в диск
+n //создать раздел
+p // тип раздела primary
+1 // номер раздела
+n // начало раздела
++nGB // конец раздела
+повторяем со вторым
+t // меняем id раздела
+1 // выбираем диск
+8e //Id lvm
+повторяем со вторым
+Получаем:
+Disk /dev/sdb: 21.5 GB, 21474836480 bytes, 41943040 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0xfcc82075
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1            2048    19533823     9765888   8e  Linux LVM
+/dev/sdb2        19533824    39065599     9765888   8e  Linux LVM
+pvcreate /dev/sdb1 // создаем физический том 1
+pvcreate /dev/sdb2 // создаем физический том 2
+vgcreate vg_new /dev/sdb1 /dev/sdb2 // создаем группу томов
+lvcreate -n lv2 -L nG vg_new // создаем логический том lv2
+lvcreate -n lv3 -L nG vg_new // создаем логический том lv3
+6) Попробовать переносить тома с одного жесткого диска на другой без остановки ОС.
+vgextend vg_new /dev/sdc1 // расширем группу томов на другой диск
+pvmove /dev/sdb2 /dev/sdc1 // переносим том на другой диск
+7) Определить точную версию ядра ОС.
+uname -r // смотрим версию ядра
