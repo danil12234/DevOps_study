@@ -1,0 +1,14 @@
+Перед выполнением заданий важно самостоятельно повторить шаги, выполняемые на уроке.
+
+1) Добавить в репозитории информацию для работы с пакетом java.
+apt-get update
+2) Установить java со всеми зависимостями.
+apt-get install default-jre
+3) Удалить java.
+apt-get remove java
+4) Установить webmin.
+wget -q -O- http://www.webmin.com/jcameron-key.asc | sudo apt-key add
+sudo apt update
+sudo apt-get install webmin
+5) Обновить все пакеты ПО. 
+apt-get upgrade
