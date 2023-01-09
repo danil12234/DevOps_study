@@ -1,0 +1,14 @@
+Перед выполнением заданий важно самостоятельно повторить шаги, выполняемые на уроке.
+
+1) Добавить в репозитории информацию для работы с пакетом java.
+yum update
+2) Установить java со всеми зависимостями.
+yumdownloader java
+yum install java
+3) Удалить java.
+yum remove java
+4) Установить webmin.
+wget https://prdownloads.sourceforge.net/webadmin/webmin-2.010-1.noarch.rpm
+yum install webmin-2.010-1.noarch.rpm
+5) Обновить все пакеты ПО. 
+yum upgrade
