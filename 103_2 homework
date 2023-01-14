@@ -15,9 +15,10 @@ uniq -u /var/log/yum.log
 7) Вывести из журналов событий только собтия входа в систему в отедльный файл.
 cat /var/log/messages | grep "of user" > last_login
 8) Из созданного файла создать несколько файлов по событиям входа кажддого отдельного пользователя (на каждого пользователя свой журнал).
-grep "user root" last_login > root.login
-grep "user test" last_login > test.login
-grep "user danil" last_login > danil.login
+ grep -e "of user root" last > root
+ grep -e "of user danil" last > danil
+ grep -e "of user test" last > test
 9) Отсортируйте информацию так, чтоб был виден только логин и время входа/выхода.
- | cut -c -16 danil.log
+?
 10) Замените в созданных файлах логин на полное имя пользователя.
+sed -e 's/danil/Danil/' danil
