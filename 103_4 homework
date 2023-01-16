@@ -9,4 +9,4 @@ p0ng ya.ru 2> error
 4) Вывести результат команды ping it-semaev.ru (десять пакетов) в файл ping.txt и в консоль одновременно. 
 ping -c 10 it-semaev.ru | tee ping
 5) Вывести результат команды ping it-semaev.ru в консоль, отображая только последние пять символов каждой строки..
-ping ya.ru | cut -d "=" -f4-
+ping it-semaev.ru | cut -d "=" -f4-
