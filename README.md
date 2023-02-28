@@ -1,2 +1,2 @@
 # DevOps_study
-rm rf :)
+Подготовка к LPIC
