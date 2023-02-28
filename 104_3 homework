@@ -1,0 +1,15 @@
+Перед выполнением заданий важно самостоятельно повторить шаги, выполняемые на уроке.
+
+1) Создать точку монтирования в корневой файловой системе.
+mkdir /root/test
+2) Вручную подключить в нее устройство и создать на нем текстовый файл, после чего отключить.
+mount /dev/sdb1 /root/test
+touch /root/test/test.txt
+umount /dev/sdb1 /root/test
+3) Создать настройку автоматического монтирования указанной файловой системы.
+vim /etc/fstab
+/dev/sdb1   /root/test    ext4    defaults    0 0
+4) Подключить сетевое устройство в файловую систему.
+mount -t cifs //IP_ADDR/PATH /mnt/documents -o user=user1,password=pass123
+5) Подключить том Windows в файловую систему.
+mount -t cifs -o username=user,password=Passw0rd //WINDOWS_HOST_IP/share /mnt/myshare
