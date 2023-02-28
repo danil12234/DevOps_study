@@ -1,0 +1,30 @@
+Перед выполнением заданий важно самостоятельно повторить шаги, выполняемые на уроке.
+
+1) Установить для диска с домашними папками квоту для пользователя системы в 100 Мб мягкую.
+Условимся, что диск уже примонтирован*
+/dev/sdb1       /home/danil/test        auto    rw,user,auto,usrquota,grpquota 00
+sudo quotacheck -cug /home/danil/test
+sudo edquota -u danil
+Disk quotas for user danil (uid 1000):
+  Filesystem                   blocks       soft       hard     inodes     soft     hard
+  /dev/sdb1                        16      102400         20          7        0        0
+  sudo quotaon /home/danil/test
+2) Установить для диска с домашними папками квоту для группы пользователей системы, в которую входит ваш пользователй, в 100 объектов жесткую.
+sudo edquota -g danil
+Disk quotas for user danil (uid 1000):
+  Filesystem                   blocks       soft       hard     inodes     soft     hard
+  /dev/sdb1                        0         0         102400       0        0        0
+3) Копируя и вставляя файлы попробовать превысить обе квоты.
+[danil@localhost test]$ last > 1.txt
+sdb1: warning, user block quota exceeded.
+4) Посмотреть отчет об использовании квот.
+[danil@localhost test]$ sudo repquota /home/danil/test/
+*** Report for user quotas on device /dev/sdb1
+Block grace time: 7days; Inode grace time: 7days
+                        Block limits                File limits
+User            used    soft    hard  grace    used  soft  hard  grace
+----------------------------------------------------------------------
+root      --      16       0       0              1     0     0
+danil     +-      16      10      20  6days       7     0     0
+5) Отключить квоту на носителе информации.
+sudo quotaoff /home/danil/test/
